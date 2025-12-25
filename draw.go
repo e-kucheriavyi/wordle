@@ -239,6 +239,19 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 		s,
 		color.RGBA{255, 255, 255, 255},
 	)
+
+	if g.Hovered != nil && g.Hovered.Id == node.Id {
+		vector.StrokeRect(
+			screen,
+			node.X,
+			node.Y,
+			node.W,
+			node.H,
+			2,
+			color.RGBA{255, 255, 255, 255},
+			false,
+		)
+	}
 }
 
 func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {

@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
 	"image/color"
 	"log"
 	"strconv"
@@ -46,6 +45,7 @@ type Game struct {
 	Word          []rune
 	GuessedWords  [][]rune
 	Node          *la.OutputItem
+	Hovered *la.OutputItem
 	LastClickedAt time.Time
 	LastSubmitted int
 }
@@ -98,6 +98,10 @@ func Collide(node *la.OutputItem, x, y float32) bool {
 }
 
 func (g *Game) UpdateGame() error {
+	x, y := ebiten.CursorPosition()
+
+	g.Hovered = FindHovered(g.Node, float32(x), float32(y))
+
 	isPressed := ebiten.IsMouseButtonPressed(ebiten.MouseButton0)
 
 	if !isPressed {
@@ -110,17 +114,11 @@ func (g *Game) UpdateGame() error {
 
 	g.LastClickedAt = time.Now()
 
-	x, y := ebiten.CursorPosition()
-
-	hovered := FindHovered(g.Node, float32(x), float32(y))
-
-	if hovered == nil {
+	if g.Hovered == nil {
 		return nil
 	}
 
-	fmt.Println(hovered.Id)
-
-	tmp := strings.ReplaceAll(hovered.Id, "key_", "")
+	tmp := strings.ReplaceAll(g.Hovered.Id, "key_", "")
 
 	l := []rune(tmp)[0]
 
