@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
 	"image/color"
 	"log"
 	"strconv"
@@ -211,22 +210,21 @@ func (g *Game) HandleSubmit() error {
 		return nil
 	}
 
-	g.LastSubmitted = lastIndex
-	g.GuessedWords = append(g.GuessedWords, make([]rune, 0, 5))
-
 	if g.IsWordGuessed() {
 		g.Stage = SCORE
+		return nil
 	}
+
+	g.LastSubmitted = lastIndex
+	g.GuessedWords = append(g.GuessedWords, make([]rune, 0, 5))
 
 	return nil
 }
 
 func (g *Game) IsWordGuessed() bool {
-	lastIndex := len(g.GuessedWords) - 2
+	lastIndex := len(g.GuessedWords) - 1
 
 	w := g.GuessedWords[lastIndex]
-
-	fmt.Println(w, g.Word)
 
 	for i := range 6 {
 		if i > 4 {
