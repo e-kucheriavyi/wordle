@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	screenW         = 480
+	screenW         = 720
 	screenH         = 720
-	keySide         = 32
 	keyGap          = 8
 	keyRowGap       = 8
-	attemptItemSide = 48
+	keySide         = (screenW - (keyGap * 11)) / 12
+	attemptItemSide = 58
+	inputDebounce   = 250
 )
 
 type Stage byte
@@ -135,7 +136,7 @@ func (g *Game) UpdateGame() error {
 		return nil
 	}
 
-	if time.Since(g.LastClickedAt) < 200*time.Millisecond {
+	if time.Since(g.LastClickedAt) < inputDebounce*time.Millisecond {
 		return nil
 	}
 

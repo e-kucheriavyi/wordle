@@ -12,7 +12,7 @@ var f []byte
 
 func GetWord(t time.Time) string {
 	year, month, day := t.Date()
-	s := time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+	s := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 
 	r := rand.New(rand.NewSource(s.Unix()))
 
