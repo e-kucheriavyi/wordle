@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"image/color"
 	"log"
 	"strconv"
 	"strings"
@@ -37,8 +36,6 @@ const (
 	GUESSED
 	PENDING
 )
-
-var bg = color.RGBA{100, 100, 100, 100}
 
 type Game struct {
 	Stage            Stage
