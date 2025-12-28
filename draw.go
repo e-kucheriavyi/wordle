@@ -229,7 +229,7 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 		false,
 	)
 
-	s := float32(4)
+	s := float32(3)
 
 	DrawLetter(
 		screen,
@@ -286,7 +286,7 @@ func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
 
 	vector.FillRect(screen, node.X, node.Y, node.W, node.H, c1, false)
 
-	s := float32(4)
+	s := float32(3)
 
 	DrawLetter(
 		screen,

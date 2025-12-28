@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	screenW         = 1280
+	screenW         = 480
 	screenH         = 720
-	keySide         = 48
+	keySide         = 32
 	keyGap          = 8
 	keyRowGap       = 8
 	attemptItemSide = 48
@@ -97,12 +97,39 @@ func Collide(node *la.OutputItem, x, y float32) bool {
 	return true
 }
 
-func (g *Game) UpdateGame() error {
+func (g *Game) IsPressed() bool {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
+		return true
+	}
+
+	touches := ebiten.TouchIDs()
+
+	return len(touches) > 0
+}
+
+func (g *Game) CursorPosition() (float32, float32) {
 	x, y := ebiten.CursorPosition()
+	if x != 0 && y != 0 {
+		return float32(x), float32(y)
+	}
+
+	touches := ebiten.TouchIDs()
+
+	if len(touches) == 0 {
+		return 0, 0
+	}
+
+	x, y = ebiten.TouchPosition(touches[0])
+
+	return float32(x), float32(y)
+}
+
+func (g *Game) UpdateGame() error {
+	x, y := g.CursorPosition()
 
 	g.Hovered = FindHovered(g.Node, float32(x), float32(y))
 
-	isPressed := ebiten.IsMouseButtonPressed(ebiten.MouseButton0)
+	isPressed := g.IsPressed()
 
 	if !isPressed {
 		return nil
