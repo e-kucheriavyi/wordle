@@ -6,10 +6,23 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/e-kucheriavyi/wordle/pallete"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	la "github.com/laranatech/gorana/layout"
 )
+
+var backspaceMap = &[]byte{
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 1, 1, 1, 1, 1, 1,
+	0, 0, 1, 0, 0, 0, 0, 0, 1,
+	0, 1, 0, 0, 1, 0, 1, 0, 1,
+	1, 0, 0, 0, 0, 1, 0, 0, 1,
+	0, 1, 0, 0, 1, 0, 1, 0, 1,
+	0, 0, 1, 0, 0, 0, 0, 0, 1,
+	0, 0, 0, 1, 1, 1, 1, 1, 1,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+}
 
 func attemptItem(r, i int) *la.NodeItem {
 	return la.Node(
@@ -38,6 +51,14 @@ func keyNode(key rune) *la.NodeItem {
 	return la.Node(
 		la.Id(fmt.Sprintf("key_%c", key)),
 		la.Width(la.Fix(keySide)),
+		la.Height(la.Fix(keySide)),
+	)
+}
+
+func growKeyNode(key rune) *la.NodeItem {
+	return la.Node(
+		la.Id(fmt.Sprintf("key_%c", key)),
+		la.Width(la.Grow(1)),
 		la.Height(la.Fix(keySide)),
 	)
 }
@@ -98,7 +119,7 @@ func keyboardNode() *la.NodeItem {
 				la.Width(la.Grow(1)),
 				la.Gap(8),
 				la.Children(
-					spacer(1),
+					growKeyNode('+'),
 					keyNode('я'),
 					keyNode('ч'),
 					keyNode('с'),
@@ -108,19 +129,7 @@ func keyboardNode() *la.NodeItem {
 					keyNode('ь'),
 					keyNode('б'),
 					keyNode('ю'),
-					spacer(1),
-				),
-			),
-			la.Node(
-				la.Id("keyboard_row_3"),
-				la.Row(),
-				la.Width(la.Grow(1)),
-				la.Gap(8),
-				la.Children(
-					spacer(1),
-					keyNode('-'),
-					keyNode('+'),
-					spacer(1),
+					growKeyNode('-'),
 				),
 			),
 		),
@@ -198,6 +207,8 @@ func CreateLayout() *la.OutputItem {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	vector.FillRect(screen, 0, 0, screenW, screenH, pallete.BG, false)
+
 	switch g.Stage {
 	case GAME:
 		g.DrawNode(screen, g.Node)
@@ -220,12 +231,12 @@ func (g *Game) DrawScore(screen *ebiten.Image) {
 		screenW/2-(float32(utf8.RuneCountInString(txt)-2)*(LetterWidth*s)),
 		screenH/2-LetterWidth*s,
 		s,
-		color.RGBA{255, 255, 255, 255},
+		pallete.FG,
 	)
 }
 
 func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
-	c := color.RGBA{150, 150, 150, 255}
+	c := pallete.PASSIVE
 
 	tmp := strings.Replace(node.Id, "key_", "", 1)
 
@@ -237,9 +248,9 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 
 	if g.IsLetterGuessed(id) {
 		if g.IsLetterInWord(id) {
-			c = color.RGBA{255, 150, 0, 255}
+			c = pallete.PRESENT
 		} else {
-			c = color.RGBA{80, 80, 80, 255}
+			c = pallete.MISS
 		}
 	}
 
@@ -253,16 +264,44 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 		false,
 	)
 
-	s := float32(3)
+	s := float32(4)
 
-	DrawLetter(
-		screen,
-		id,
-		node.X+(keySide/2)-((LetterWidth*s)/2),
-		node.Y+(keySide/2)-((LetterWidth*s)/2),
-		s,
-		color.RGBA{255, 255, 255, 255},
-	)
+	x := node.X+(node.W/2)-((LetterWidth*s)/2)
+	y := node.Y+(node.H/2)-((LetterWidth*s)/2)
+
+	if id == '-' {
+		DrawBitmap(
+			screen,
+			backspaceMap,
+			x,
+			y,
+			s,
+			9,
+			pallete.FG,
+		)
+	} else if id == '+' {
+		txt := "enter"
+		s := float32(1.5)
+		x := node.X + (node.W / 2) - (float32(len(txt)) * LetterWidth * s) / 2
+		y := node.Y + (node.H / 2) - (LetterWidth * 2) / 2
+		DrawText(
+			screen,
+			"enter",
+			x,
+			y,
+			s,
+			pallete.FG,
+		)
+	} else {
+		DrawLetter(
+			screen,
+			id,
+			x,
+			y,
+			s,
+			pallete.FG,
+		)
+	}
 
 	if g.Hovered != nil && g.Hovered.Id == node.Id {
 		vector.StrokeRect(
@@ -272,15 +311,13 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 			node.W,
 			node.H,
 			2,
-			color.RGBA{255, 255, 255, 255},
+			pallete.FG,
 			false,
 		)
 	}
 }
 
 func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
-	c := color.RGBA{100, 100, 100, 255}
-
 	vector.StrokeRect(
 		screen,
 		node.X,
@@ -288,7 +325,7 @@ func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
 		node.W,
 		node.H,
 		2,
-		c,
+		pallete.FG,
 		false,
 	)
 
@@ -306,11 +343,11 @@ func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
 
 	status := g.GetLetterStatus(r, i, w[i])
 
-	c1 := getColorByStatus(status)
+	c := getColorByStatus(status)
 
-	vector.FillRect(screen, node.X, node.Y, node.W, node.H, c1, false)
+	vector.FillRect(screen, node.X, node.Y, node.W, node.H, c, false)
 
-	s := float32(3)
+	s := float32(4)
 
 	DrawLetter(
 		screen,
@@ -318,20 +355,20 @@ func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
 		node.X+(attemptItemSide/2)-((LetterWidth*s)/2),
 		node.Y+(attemptItemSide/2)-((LetterWidth*s)/2),
 		s,
-		color.RGBA{255, 255, 255, 255},
+		pallete.FG,
 	)
 }
 
 func getColorByStatus(status LetterStatus) color.Color {
 	switch status {
 	case GUESSED:
-		return color.RGBA{0, 255, 0, 255}
+		return pallete.MATCH
 	case PRESENT:
-		return color.RGBA{255, 150, 0, 255}
+		return pallete.PRESENT
 	case WRONG:
-		return color.RGBA{80, 80, 80, 255}
+		return pallete.MISS
 	}
-	return color.RGBA{200, 200, 200, 255}
+	return pallete.PASSIVE
 }
 
 func (g *Game) DrawHeader(screen *ebiten.Image, node *la.OutputItem) {
@@ -348,7 +385,7 @@ func (g *Game) DrawHeader(screen *ebiten.Image, node *la.OutputItem) {
 		node.X+node.W/2-(float32(len(txt))*LetterWidth*s)/2,
 		node.Y+node.Y/2+(LetterWidth*s)/2,
 		s,
-		color.RGBA{255, 255, 255, 255},
+		pallete.FG,
 	)
 }
 

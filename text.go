@@ -24,11 +24,20 @@ func DrawText(screen *ebiten.Image, txt string, x, y, s float32, c color.Color) 
 
 func DrawLetter(screen *ebiten.Image, l rune, x, y, s float32, c color.Color) {
 	m := GetLetterMap(l)
+	DrawBitmap(screen, m, x, y, s, LetterWidth, c)
+}
 
+func DrawBitmap(
+	screen *ebiten.Image,
+	m *[]byte,
+	x, y, s float32,
+	l int,
+	c color.Color,
+) {
 	i := 0
 
-	for j := range LetterWidth {
-		for k := range LetterWidth {
+	for j := range l {
+		for k := range l {
 			pX := x + float32(k)*s
 			pY := y + float32(j)*s
 

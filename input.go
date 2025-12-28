@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -138,7 +137,6 @@ func MapInputToRune(k ebiten.Key) rune {
 	r, ok := keymap[name]
 
 	if !ok {
-		fmt.Println(k, name)
 		return ' '
 	}
 	return r
