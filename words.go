@@ -17,7 +17,7 @@ func GetWord(t time.Time) string {
 	r := rand.New(rand.NewSource(s.Unix()))
 
 	var words []string = strings.Split(strings.ToLower(string(f)), "\n")
-	i := r.Intn(len(words))
+	i := r.Intn(len(words) - 1)
 
 	return words[i]
 }
@@ -27,15 +27,8 @@ func ValidateWord(guess string) bool {
 
 	for i := range len(words) {
 		word := words[i]
-
-		// file word's len is 6 for some reason
-		for j := range 6 {
-			if j == 5 {
-				return true
-			}
-			if guess[j] != word[j] {
-				break
-			}
+		if word == guess {
+			return true
 		}
 	}
 

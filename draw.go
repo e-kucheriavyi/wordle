@@ -228,7 +228,7 @@ func (g *Game) DrawScore(screen *ebiten.Image) {
 	DrawText(
 		screen,
 		txt,
-		screenW/2-(float32(utf8.RuneCountInString(txt)-2)*(LetterWidth*s)),
+		screenW/2-(float32(utf8.RuneCountInString(txt))*(LetterWidth*s))/2,
 		screenH/2-LetterWidth*s,
 		s,
 		pallete.FG,
