@@ -9,18 +9,31 @@ import (
 
 const LetterWidth = 8
 
-func DrawLetter(screen *ebiten.Image, l rune, x, y, scale float32, c color.Color) {
+func DrawText(screen *ebiten.Image, txt string, x, y, s float32, c color.Color) {
+	for i, l := range txt {
+		DrawLetter(
+			screen,
+			l,
+			x+float32(i)*(LetterWidth*s),
+			y,
+			s,
+			c,
+		)
+	}
+}
+
+func DrawLetter(screen *ebiten.Image, l rune, x, y, s float32, c color.Color) {
 	m := GetLetterMap(l)
 
 	i := 0
 
 	for j := range LetterWidth {
 		for k := range LetterWidth {
-			pX := x + float32(k)*scale
-			pY := y + float32(j)*scale
+			pX := x + float32(k)*s
+			pY := y + float32(j)*s
 
 			if (*m)[i] == 1 {
-				vector.FillRect(screen, pX, pY, scale, scale, c, false)
+				vector.FillRect(screen, pX, pY, s, s, c, false)
 			}
 
 			i++

@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 	"image/color"
 	"log"
 	"strconv"
@@ -53,7 +54,7 @@ type Game struct {
 func NewGame() *Game {
 	return &Game{
 		Stage:         GAME,
-		Word:          []rune{'ж', 'а', 'б', 'к', 'а'},
+		Word:          []rune(GetWord(time.Now())),
 		GuessedWords:  make([][]rune, 0, 6),
 		Node:          CreateLayout(),
 		LastSubmitted: -1,
@@ -206,10 +207,37 @@ func (g *Game) HandleSubmit() error {
 		return nil
 	}
 
+	if !ValidateWord(string(g.GuessedWords[lastIndex])) {
+		return nil
+	}
+
 	g.LastSubmitted = lastIndex
 	g.GuessedWords = append(g.GuessedWords, make([]rune, 0, 5))
 
+	if g.IsWordGuessed() {
+		g.Stage = SCORE
+	}
+
 	return nil
+}
+
+func (g *Game) IsWordGuessed() bool {
+	lastIndex := len(g.GuessedWords) - 2
+
+	w := g.GuessedWords[lastIndex]
+
+	fmt.Println(w, g.Word)
+
+	for i := range 6 {
+		if i > 4 {
+			return true
+		}
+		if w[i] != g.Word[i] {
+			return false
+		}
+	}
+
+	return false
 }
 
 func (g *Game) IsLetterGuessed(letter rune) bool {

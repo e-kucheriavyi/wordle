@@ -144,7 +144,7 @@ func CreateLayout() *la.OutputItem {
 		la.Children(
 			la.Node(
 				la.Id("header"),
-				la.Height(la.Fix(16)),
+				la.Height(la.Fix(64)),
 				la.Width(la.Grow(1)),
 			),
 			la.Node(
@@ -197,7 +197,27 @@ func CreateLayout() *la.OutputItem {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.DrawNode(screen, g.Node)
+	switch g.Stage {
+	case GAME:
+		g.DrawNode(screen, g.Node)
+	case SCORE:
+		g.DrawScore(screen)
+	}
+}
+
+func (g *Game) DrawScore(screen *ebiten.Image) {
+	txt := fmt.Sprintf("%d / %d", len(g.GuessedWords), 6)
+
+	s := float32(8)
+
+	DrawText(
+		screen,
+		txt,
+		screenW/2-(float32(len(txt))*LetterWidth*s)/2,
+		screenH/2-LetterWidth*s,
+		s,
+		color.RGBA{255, 255, 255, 255},
+	)
 }
 
 func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
@@ -310,8 +330,28 @@ func getColorByStatus(status LetterStatus) color.Color {
 	return color.RGBA{200, 200, 200, 255}
 }
 
+func (g *Game) DrawHeader(screen *ebiten.Image, node *la.OutputItem) {
+	v := len(g.GuessedWords) - 1
+	if v < 0 {
+		v = 0
+	}
+	s := float32(4)
+
+	txt := fmt.Sprintf("%d / %d", v, 6)
+	DrawText(
+		screen,
+		txt,
+		node.X+node.W/2-(float32(len(txt))*LetterWidth*s)/2,
+		node.Y+node.Y/2+(LetterWidth*s)/2,
+		s,
+		color.RGBA{255, 255, 255, 255},
+	)
+}
+
 func (g *Game) DrawNode(screen *ebiten.Image, node *la.OutputItem) {
-	if strings.HasPrefix(node.Id, "key_") {
+	if node.Id == "header" {
+		g.DrawHeader(screen, node)
+	} else if strings.HasPrefix(node.Id, "key_") {
 		g.DrawKey(screen, node)
 	} else if strings.HasPrefix(node.Id, "attempt_") {
 		g.DrawAttemptItem(screen, node)
