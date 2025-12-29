@@ -12,6 +12,15 @@ import (
 	la "github.com/laranatech/gorana/layout"
 )
 
+const (
+	ShakeSpeed = 6
+	ShakeValue = 600
+)
+
+func (g *Game) StartShaking() {
+	g.ShakeTimer = ShakeValue
+}
+
 var backspaceMap = &[]byte{
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 1, 1, 1, 1, 1, 1,
@@ -318,18 +327,32 @@ func (g *Game) DrawKey(screen *ebiten.Image, node *la.OutputItem) {
 }
 
 func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
+	r, i := ExtractIndecies(node.Id)
+
+	x := node.X
+	y := node.Y
+
+	if r == len(g.GuessedWords)-1 && g.ShakeTimer > 0 {
+		d := float32(ShakeSpeed)
+
+		if g.ShakeTimer > ShakeValue/2 {
+			d *= -1
+		}
+
+		x += d
+		g.ShakeTimer -= ShakeSpeed
+	}
+
 	vector.StrokeRect(
 		screen,
-		node.X,
-		node.Y,
+		x,
+		y,
 		node.W,
 		node.H,
 		2,
 		pallete.FG,
 		false,
 	)
-
-	r, i := ExtractIndecies(node.Id)
 
 	if r > len(g.GuessedWords)-1 {
 		return
@@ -345,15 +368,15 @@ func (g *Game) DrawAttemptItem(screen *ebiten.Image, node *la.OutputItem) {
 
 	c := getColorByStatus(status)
 
-	vector.FillRect(screen, node.X, node.Y, node.W, node.H, c, false)
+	vector.FillRect(screen, x, y, node.W, node.H, c, false)
 
 	s := float32(4)
 
 	DrawLetter(
 		screen,
 		w[i],
-		node.X+(attemptItemSide/2)-((LetterWidth*s)/2),
-		node.Y+(attemptItemSide/2)-((LetterWidth*s)/2),
+		x+(attemptItemSide/2)-((LetterWidth*s)/2),
+		y+(attemptItemSide/2)-((LetterWidth*s)/2),
 		s,
 		pallete.FG,
 	)
