@@ -261,7 +261,7 @@ func main() {
 	game := NewGame()
 
 	ebiten.SetWindowSize(screenW, screenH)
-	ebiten.SetWindowTitle("Wordle")
+	ebiten.SetWindowTitle("Five letters")
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err.Error())

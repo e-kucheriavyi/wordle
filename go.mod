@@ -1,4 +1,4 @@
-module github.com/e-kucheriavyi/wordle
+module github.com/e-kucheriavyi/five-letters
 
 go 1.25.5
 

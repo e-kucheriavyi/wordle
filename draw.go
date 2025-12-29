@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/e-kucheriavyi/wordle/pallete"
+	"github.com/e-kucheriavyi/five-letters/pallete"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	la "github.com/laranatech/gorana/layout"

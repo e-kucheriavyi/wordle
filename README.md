@@ -1,4 +1,4 @@
-# Wordle
+# Five letters
 
 ## Run
 
@@ -10,5 +10,4 @@ go run .
 ## Credits
 
 - Author: Evgenii Kucheriavyi
-- Dictionary: https://github.com/mediahope/Wordle-Russian-Dictionary
 
