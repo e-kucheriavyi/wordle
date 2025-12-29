@@ -46,6 +46,7 @@ type Game struct {
 	LastClickedAt    time.Time
 	LastKeyPressedAt time.Time
 	LastSubmitted    int
+	ShakeTimer       int
 }
 
 func NewGame() *Game {
@@ -167,10 +168,12 @@ func (g *Game) HandleSubmit() error {
 	}
 
 	if len(g.GuessedWords[lastIndex]) != 5 {
+		g.StartShaking()
 		return nil
 	}
 
 	if !ValidateWord(string(g.GuessedWords[lastIndex])) {
+		g.StartShaking()
 		return nil
 	}
 
